@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import RPi.GPIO as GPIO
+from subprocess import call
+
 GPIO.setwarnings(False) # Ignore warning for now
 GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
 
@@ -49,6 +51,24 @@ while True:
         else:
             GPIO.output(outputs[switch], GPIO.HIGH)
 
+    # Check how many switches are pressed.
+    pressed=0
+    for switch in [1, 2, 3, 4, 5]:
+        if GPIO.input(inputs[switch-1]) == GPIO.HIGH:
+            pressed=pressed+1
+
+    # Set RBG to red if anything other than 1 switch is flipped.
+    if (pressed == 1):
+        GPIO.output(gled, GPIO.LOW)
+        GPIO.output(rled, GPIO.HIGH)
+    elif (pressed == 5):
+        GPIO.output(gled, GPIO.LOW)
+        GPIO.output(rled, GPIO.LOW)
+    else:
+        GPIO.output(rled, GPIO.LOW)
+        GPIO.output(gled, GPIO.HIGH)
+
+
     if GPIO.input(bigredbutton) == GPIO.HIGH:
         pressed=0;
         print ("BRB pressed.")
@@ -62,3 +82,8 @@ while True:
                 print ("Switch " ,switch, " is on.")
 
         print (pressed, " switches are on.")
+
+        if (pressed == 5):
+            print ("Shutting down...")
+            call("sudo init 0", shell=True)
+
