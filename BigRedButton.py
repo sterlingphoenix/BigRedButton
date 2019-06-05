@@ -2,6 +2,13 @@
 import RPi.GPIO as GPIO
 from subprocess import call
 
+# Initialise "keyboard"
+NULL_CHAR = chr(0)
+def write_report(report):
+    with open('/dev/hidg0', 'rb+') as fd:
+        fd.write(report.encode())
+
+
 GPIO.setwarnings(False) # Ignore warning for now
 GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
 
@@ -85,11 +92,42 @@ while True:
         for switch in [1, 2, 3, 4, 5]:
             if GPIO.input(inputs[switch-1]) == GPIO.HIGH:
                 pressed=pressed+1
-                print ("Switch " ,switch, " is on.")
+#                print ("Switch " ,switch, " is on.")
+#
+#        print (pressed, " switches are on.")
 
-        print (pressed, " switches are on.")
 
         if (pressed == 5):
             print ("(Not) Shutting down...")
             #call("sudo init 0", shell=True)
 
+        if (pressed == 1):
+
+            # Switch 1, Win+L
+            if (GPIO.input(switch1) == GPIO.HIGH):
+                print ("Switch 1, pressing Win+L.")
+                write_report(chr(8)+NULL_CHAR+chr(15)+NULL_CHAR*5)
+
+            # Switch 2, Ctrl+Shift+Power (???)
+            elif (GPIO.input(switch2) == GPIO.HIGH):
+                print ("Switch 2, pressing Ctrl+Shift+Power.")
+                write_report(chr(3)+NULL_CHAR+chr(102)+NULL_CHAR*5)
+
+            # Switch 3, press space
+            elif (GPIO.input(switch3) == GPIO.HIGH):
+                print ("Switch 3, pressing space.")
+                write_report(NULL_CHAR*2+chr(44)+NULL_CHAR*5)
+
+            # Switch 4, press enter?
+            elif (GPIO.input(switch4) == GPIO.HIGH):
+                print ("Switch 4, pressing enter.")
+                write_report(NULL_CHAR*2+chr(40)+NULL_CHAR*5)
+
+            # Switch 5, press Esc
+            elif (GPIO.input(switch5) == GPIO.HIGH):
+                print ("Switch 5, pressing Esc.")
+                write_report(NULL_CHAR*2+chr(41)+NULL_CHAR*5)
+
+
+            # Release all keys
+            write_report(NULL_CHAR*8)
