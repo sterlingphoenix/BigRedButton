@@ -98,8 +98,12 @@ while True:
 
 
         if (pressed == 5):
-            print ("(Not) Shutting down...")
-            #call("sudo init 0", shell=True)
+            print ("Shutting down...")
+            GPIO.output(gled, GPIO.HIGH)
+            GPIO.output(rled, GPIO.HIGH)
+            GPIO.output(bled, GPIO.LOW)
+
+            call("sudo init 0", shell=True)
 
         if (pressed == 1):
 
