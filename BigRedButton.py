@@ -12,9 +12,10 @@ oled3=16
 oled4=18
 oled5=22
 
-# RGB LED, green header/red header
+# RGB LED, green header/red header/blue header
 rled=24
 gled=26
+bled=19
 
 # Toggle switches
 switch1=29
@@ -27,7 +28,7 @@ switch5=37
 bigredbutton=40
 
 # Make lists out of all that nonsense
-outputs = [ oled1, oled2, oled3, oled4, oled5, gled, rled ] 
+outputs = [ oled1, oled2, oled3, oled4, oled5, gled, rled, bled ] 
 inputs = [ switch1, switch2, switch3, switch4, switch5, bigredbutton ]
 
 # Setup input/output GPIOs.
@@ -40,6 +41,7 @@ GPIO.setup (inputs, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 # Turn RGB LED to green.
 GPIO.output(rled, GPIO.HIGH)
+GPIO.output(bled, GPIO.HIGH)
 GPIO.output(gled, GPIO.LOW)
 
 print("Hello!")
@@ -58,15 +60,19 @@ while True:
             pressed=pressed+1
 
     # Set RBG to red if anything other than 1 switch is flipped.
+    # Unless it's 5, then turn everything on. So, white.
     if (pressed == 1):
         GPIO.output(gled, GPIO.LOW)
         GPIO.output(rled, GPIO.HIGH)
+        GPIO.output(bled, GPIO.HIGH)
     elif (pressed == 5):
         GPIO.output(gled, GPIO.LOW)
         GPIO.output(rled, GPIO.LOW)
+        GPIO.output(bled, GPIO.LOW)
     else:
         GPIO.output(rled, GPIO.LOW)
         GPIO.output(gled, GPIO.HIGH)
+        GPIO.output(bled, GPIO.HIGH)
 
 
     if GPIO.input(bigredbutton) == GPIO.HIGH:
@@ -84,6 +90,6 @@ while True:
         print (pressed, " switches are on.")
 
         if (pressed == 5):
-            print ("Shutting down...")
-            call("sudo init 0", shell=True)
+            print ("(Not) Shutting down...")
+            #call("sudo init 0", shell=True)
 
